@@ -53,72 +53,14 @@ double angle(int x_h, int y_h, int x_r, int y_r, int x_b, int y_b)
   v2 = y_h - y_r;
   uv = u1 * v1 + u2 * v2;
   Serial.println(uv / (v * u));
-  return acos(uv / (v * u))*180/3.14;
+  return acos(uv / (v * u)) * 180 / 3.14;
 }
+
 //**************************************************************************************************
 
-//**************************************************************************************************
-String follow(String obj)
-{
-  for (i = 0; i < pixy.ccc.numBlocks; i++)
-  {
-    if (pixy.ccc.blocks[i].m_signature == 3)
-    {
-      x_b1 = pixy.ccc.blocks[i].m_x;
-      y_b1 = pixy.ccc.blocks[i].m_y;
-      b1 = 1;
-    }
-    else if (pixy.ccc.blocks[i].m_signature == 4)
-    {
-      x_b2 = pixy.ccc.blocks[i].m_x;
-      y_b2 = pixy.ccc.blocks[i].m_y;
-      b2 = 1;
-    }
-  }
-  if (obj == "fb1x" )
-  {
-    if (b1)
-    {
-      return (String) x_b1;
-    }
-    else
-      return "p";
-
-  }
-  else if (obj == "fb1y" )
-  {
-    if (b1)
-    {
-      return (String)y_b1;
-    }
-    else
-      return "p";
-
-  }
-  else if (obj == "fb2x" )
-  {
-    if (b2)
-    {
-      return (String)x_b2;
-    }
-    else
-      return "p";
-
-  }
-  else if (obj == "fb2y" )
-  {
-    if (b2)
-    {
-      return (String)y_b2;
-    }
-    else
-      return "p";
-
-  }
-}
 String calcinfo(String obj)
 {
-
+  robot = 0; head = 0; b1 = 0; b2 = 0; tosend = ""; info = "";
   for (i = 0; i < pixy.ccc.numBlocks; i++)
   {
     if (pixy.ccc.blocks[i].m_signature == 1)
@@ -263,7 +205,7 @@ void  recive_send()
     receivedMessage = BT.readString();
     Serial.println(receivedMessage);
     pixy.ccc.getBlocks();
-    robot = 0; head = 0; b1 = 0; b2 = 0; tosend = ""; info = "";
+
     if (pixy.ccc.numBlocks && (receivedMessage == "db1" || receivedMessage == "db2" || receivedMessage == "ab1" || receivedMessage == "ab2" || receivedMessage == "c" ))
     {
       tosend = calcinfo((String)receivedMessage);
@@ -275,59 +217,12 @@ void  recive_send()
       BT.print('p');
     }
 
-    else if (receivedMessage == "fb2" || receivedMessage == "fb1")
-    {
-
-      xf = follow((String)receivedMessage + "x");
-      yf = follow((String)receivedMessage + "y");
-      startcount = 1;
-    }
-    else if (receivedMessage == "stop")
-    {
-      BT.print("stop");
-    }
-
-
   }
-  //-------------------------------------------------------------
-  if (receivedMessage == "fb2" || receivedMessage == "fb1")
-  {
-    if (follow((String)receivedMessage + "x") == "p")
-    {
-      tosend = "p";
-      BT.print(tosend);
-    }
-    else
-    {
-      if (startcount)
-      {
-        time_follow = millis();
-        startcount = 0;
-      }
-      if (millis() - time_follow > 60000)
-      {
-        tosend = "timeout";
-        BT.print(tosend);
-        receivedMessage = "";
-      }
-      int xfi, yfi, xff, yff;
-      xfi = xf.toInt();
-      yfi = yf.toInt();
-      xff = follow((String)receivedMessage + "x").toInt();
-      yff = follow((String)receivedMessage + "y").toInt();
-      if (xff - xfi > 5 || xfi - xff > 5 || yff - yfi > 5 || yfi - yff > 5)
-      {
-        startcount = 1;
-        tosend = "cf";
-        BT.print(tosend);
-        receivedMessage = "";
-
-      }
-    }
-  }
-
 
 }
+
+
+
 //***************************************************************************
 void loop()
 {
