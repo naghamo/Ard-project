@@ -1,22 +1,26 @@
 #include <Pixy2.h>
-
 #include <Adafruit_NeoPixel.h>
 #include <SoftwareSerial.h>
+
+
+
+#define PIN   6
+#define NUMPIXELS 4
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Pixy2 pixy;
 SoftwareSerial BT(4, 2);
+
+
 double a = 0, d = 0;
 String tosend = "", info = "", xf, yf, receivedMessage;
 int i;
-Pixy2 pixy;
-
 int x_r, y_r, x_h, y_h, x_b1, y_b1, x_b2, y_b2;
 bool robot = 0, head = 0, b1 = 0, b2 = 0;
 double v, u, u1, v1, u2, v2, uv;
 bool startcount = 1;
 unsigned long times, time_follow;
 
-#define PIN   6
-#define NUMPIXELS 4
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
 //***********************************************
 void setup()
 {
@@ -36,14 +40,13 @@ void setup()
   times = millis();
 }
 //**************************************************************************************************
-double distance(int x_r, int y_r, int x_b, int y_b) {
+int distance(int x_r, int y_r, int x_b, int y_b) {
 
   return round(sqrt(pow((x_r - x_b), 2) + pow((y_r - y_b), 2)));
 
-
 }
 //****************************************************************************************************
-double angle(int x_h, int y_h, int x_r, int y_r, int x_b, int y_b)
+int angle(int x_h, int y_h, int x_r, int y_r, int x_b, int y_b)
 {
   v = sqrt(pow((x_r - x_b), 2) + pow((y_r - y_b), 2));
   u = sqrt(pow((x_r - x_h), 2) + pow((y_r - y_h), 2));
@@ -53,7 +56,7 @@ double angle(int x_h, int y_h, int x_r, int y_r, int x_b, int y_b)
   v2 = y_h - y_r;
   uv = u1 * v1 + u2 * v2;
   Serial.println(uv / (v * u));
-  return acos(uv / (v * u)) * 180 / 3.14;
+  return round(acos(uv / (v * u)) * 180 / 3.14);
 }
 
 //**************************************************************************************************
